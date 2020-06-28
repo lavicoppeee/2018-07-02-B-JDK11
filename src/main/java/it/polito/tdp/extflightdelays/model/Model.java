@@ -16,6 +16,8 @@ public class Model {
 	private Graph<Airport,DefaultWeightedEdge> graph;
 	List<Airport> airports;
 	
+	Double bestOre;
+	List<Airport> bestItinerario;
 	
 	public Model() {
 		dao=new ExtFlightDelaysDAO();
@@ -62,6 +64,59 @@ public class Model {
 	public Collection<Airport> Airport(){
 		return idMap.values();
 	}
+	
+	public List<Airport> getCammino(int ore, Airport a){
+		this.bestOre=0.0;
+		this.bestItinerario=new ArrayList<>();
+		
+		List<Airport> parziale=new ArrayList<>();
+		parziale.add(a);
+		ricorsione(parziale,ore,a);
+		return bestItinerario;
+	}
+
+	private void ricorsione(List<Airport> parziale, int oreMax, Airport a) {
+
+		double ore = this.calcolaOre(parziale);
+		if (ore < oreMax) {
+			if (ore > bestOre) {
+				this.bestOre = ore;
+				this.bestItinerario = new ArrayList<>(parziale);
+			}
+		} else
+			return;
+		List<Airport> vicini = Graphs.neighborListOf(graph, a);
+		for (Airport v : vicini) {
+			if (!parziale.contains(v)) {
+				parziale.add(v);
+				ricorsione(parziale, oreMax, v);
+				parziale.remove(parziale.size() - 1);
+			}
+		}
+
+	}
+
+	
+	private double calcolaOre(List<Airport> parziale) {
+		double ore=0.0;
+		
+		for(int i=1; i<parziale.size();i++) {
+			if(this.graph.getEdge(parziale.get(i), parziale.get(i-1)) != null) {
+				
+			Double oreNew=this.graph.getEdgeWeight(this.graph.getEdge(parziale.get(i-1),parziale.get(i)));
+			ore+=2*oreNew;
+		}
+	}
+		
+		return ore;
+	}
+
+
+	public Double getBestOre() {
+		return bestOre;
+	}
+	
+	
 	
 	
 	

@@ -86,7 +86,29 @@ public class ExtFlightDelaysController {
 
     @FXML
     void doCercaItinerario(ActionEvent event) {
+        this.txtResult.clear();
+    
+    	Airport a=this.cmbBoxAeroportoPartenza.getValue();
+    	if(a==null) {
+    		txtResult.setText("Devi inserire prima creare il grafo");
+    		return;
+    	}
+    	 String xTemp=this.numeroOreTxtInput.getText();
+         Integer x;
+      	
+    	try {
+     		x=Integer.parseInt(xTemp);
+     	}catch(NumberFormatException e) {
+     		
+     		txtResult.setText("Devi inserire solo numeri");
+     		return ;
+     	}
     	
+    	List<Airport> aList=this.model.getCammino(x,a);
+    	txtResult.appendText("L'Aeroporto "+a+" con un numMax di ore "+model.getBestOre()+" è connesso ad: \n");
+    	for(Airport aL:aList) {
+    		txtResult.appendText(aL.toString()+"\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
